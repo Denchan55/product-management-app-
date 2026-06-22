@@ -3,6 +3,7 @@
 <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
     @csrf
     @method('PUT')
+    <a href="{{ route('products.index') }}">商品一覧</a> ＞ {{ $product->name }}
 
     <!-- 商品名 -->
     <p>商品名</p>
@@ -40,6 +41,10 @@
     @enderror
     <!-- 画像 -->
     <input type="file" name="image">
+    @if ($product->image_path)
+        <img src="{{ asset('storage/images/' . $product->image_path) }}" alt="商品画像" width="200">
+    @endif
+
     @error('image')
         <div style="color:red;">{{ $message }}</div>
     @enderror
@@ -54,4 +59,10 @@
     @enderror
     <a href="{{ route('products.index') }}">戻る</a>
     <button type="submit">変更を保存</button>
+    <form action="{{ route('products.destroy', $product->id) }}" method="POST" onsubmit="return confirm('削除しますか？')">
+        @csrf
+        @method('DELETE')
+        <button type="submit" class="trash-button">🗑</button>
+    </form>
+
 </form>

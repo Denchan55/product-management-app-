@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\Season;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -50,12 +51,18 @@ $validated = $request->validate([
     'image.required' => '画像を選択してください',
     'image.mimes' => '｢.png｣または｢.jpeg｣形式でアップロードしてください',
     ]);
+    // 2. 画像を保存
+    $imageName = null;
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('public/images');
+        $imageName = basename($path); 
+    }
     // 2. 商品を保存
     $product = Product::create([
         'name' => $validated['name'],
         'price' => $validated['price'],
         'description' => $validated['description'],
-        'image_path' => '後で実装',
+        'image_path' => $imageName,
 ]);
 
 // 3. 季節を紐づける
@@ -91,12 +98,22 @@ public function update(Request $request, $id)
     $product->price = $validated['price'];
     $product->description = $validated['description'];
 
-    // ★ 画像は後で実装
-    // if ($request->hasFile('image')) { ... }
+    // ★ 新しい画像がアップロードされた場合のみ処理
+    if ($request->hasFile('image')) {
+
+        // ★ 古い画像を削除（余裕があれば）
+        if ($product->image_path) {
+            Storage::delete('public/images/' . $product->image_path);
+        }
+
+        // ★ 新しい画像を保存
+        $path = $request->file('image')->store('public/images');
+        $product->image_path = basename($path);
+    }
 
     $product->save();
 
-    // ★ 季節は別テーブルなので sync
+    // ★ 季節を更新
     $product->seasons()->sync($validated['season'] ?? []);
 
     return redirect()->route('products.detail', $id);
