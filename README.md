@@ -49,8 +49,8 @@ erDiagram
   }
 
   products ||--o{ product_season : "1対多"
-  seasons ||--o{ product_season : "1対多"
-
+  seasons  ||--o{ product_season : "1対多"
+```
 
 ## 画面遷移図（Flowchart）
 
@@ -87,7 +87,8 @@ Docker Compose
 1. **リポジトリをクローン**
 
     ```bash
-    git clone https://github.com/Denchan55/product-management-app-.git
+    git clone https://github.com/Denchan55/product-management-app
+
     ```
 
 2. **.envファイルの準備**
