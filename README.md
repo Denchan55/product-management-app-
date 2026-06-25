@@ -26,47 +26,45 @@ phpMyAdmin
 
 ## ER図
 
-````mermaid
-erDiagram
+【products テーブル】
 
-  products {
-    int id PK
-    string name
-    int price
-    string image_path
-    string description
-  }
+- id (PK)
+- name
+- price
+- image_path
+- description
 
-  seasons {
-    int id PK
-    string name
-  }
+【seasons テーブル】
 
-  product_season {
-    int id PK
-    int product_id FK
-    int season_id FK
-  }
+- id (PK)
+- name
 
-  products ||--o{ product_season : "1対多"
-  seasons  ||--o{ product_season : "1対多"
-```
+【product_season テーブル】※中間テーブル
+
+- id (PK)
+- product_id (FK → products.id)
+- season_id (FK → seasons.id)
+
+【リレーション】
+
+- products 1 --- \* product_season
+- seasons 1 --- \* product_season
 
 ## 画面遷移図（Flowchart）
 
-flowchart TD
+PG01 商品一覧 (/products)
+├─ 商品クリック → PG02 商品詳細 (/products/{id})
+├─ 新規登録 → PG04 商品登録 (/products/register)
+└─ 検索 → PG05 検索 (/products/search)
 
-    A[PG01 商品一覧<br>/products] -->|商品クリック| B[PG02 商品詳細<br>/products/{id}]
-    A -->|新規登録| D[PG04 商品登録<br>/products/register]
-    A -->|検索| E[PG05 検索<br>/products/search]
+PG02 商品詳細 (/products/{id})
+├─ 編集 → PG03 商品更新 (/products/{id})
+├─ 削除 → PG06 商品削除 (/products/{id})
+└─ 一覧へ戻る → PG01 商品一覧
 
-    B -->|編集| C[PG03 商品更新<br>/products/{id}]
-    B -->|削除| F[PG06 商品削除<br>/products/{id}]
-    B -->|一覧へ戻る| A
-
-    C -->|更新完了| B
-    D -->|登録完了| A
-    E -->|検索結果から商品クリック| B
+PG03 商品更新 → 更新完了後 PG02 商品詳細  
+PG04 商品登録 → 登録完了後 PG01 商品一覧  
+PG05 検索 → 商品クリックで PG02 商品詳細
 
 ## 開発環境URL
 
@@ -169,6 +167,7 @@ Docker Compose
     sail npm install
     sail npm run dev
     ```
+
     `npm run dev` は開発中は起動したままにしてください。
 
 8. **アプリケーションへのアクセス**
@@ -179,7 +178,7 @@ Docker Compose
 
 ```bash
 sail artisan test
-````
+```
 
 カバレッジ付きで実行する場合:
 
